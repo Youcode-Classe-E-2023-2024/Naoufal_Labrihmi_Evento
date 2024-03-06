@@ -135,12 +135,23 @@ class EventController extends Controller
 
     public function admin_eventType_delete($id)
     {
+        // Find the event type by ID
         $eventType = EventType::find($id);
-        $eventType->delete();
+
+        // Check if the event type exists
         if ($eventType) {
-            return redirect('admin/eventTypes');
+            // Delete all events associated with the event type
+            $eventsToDelete = Events::where('event_type_id', $id)->get();
+            foreach ($eventsToDelete as $event) {
+                $event->delete();
+            }
+
+            // Delete the event type itself
+            $eventType->delete();
+
+            return redirect()->route('admin.eventTypes')->with('success', 'Event Type and associated events have been deleted successfully.');
         } else {
-            return redirect('admin/eventType');
+            return redirect()->route('admin.eventTypes')->with('error', 'Event Type not found.');
         }
     }
 
