@@ -3,7 +3,7 @@
 @section('content')
 
 <d iv class="container mt-3">
-    <h2>All Events</h2>
+    <h2>All Events Categories</h2>
     <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iusto nemo totam commodi, dolorem quia quaerat mollitia sint nulla recusandae quam!</p>
     <div class="row">
         <!-- table section -->
@@ -49,9 +49,11 @@
                     </div>
                     </td> --}}
                     <td>
-                        <button type="button" class="btn btn-primary editeventTypeModalbtn" data-toggle="modal" data-target="#editEventTypeModal" data-id="{{$type->event_type_id}}">
+                        <a href="{{ route('admin.editEventType', $type->event_type_id) }}" class="btn btn-primary">
                             <i class="fa fa-edit"></i>
-                        </button>
+                        </a>
+
+
                         <a href="{{url('admin/eventType/delete')}}/{{$type->event_type_id}}" class="btn btn-danger m-1 deleteBtn "><i class="fa fa-trash"></i></a>
                     </td>
                     </tr>
