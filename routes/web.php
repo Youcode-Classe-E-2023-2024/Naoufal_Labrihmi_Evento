@@ -151,10 +151,22 @@ Route::group(['middleware' => 'admin_guard', 'prefix' => 'admin'], function () {
     //EventTypes Routes
     Route::get('/eventTypes', [EventController::class, 'eventTypes'])->name('admin.eventTypes');
     Route::post('/eventTypes/register/check', [EventController::class, 'eventTypes_register'])->name('eventTypes_register');
-    Route::post('/eventTypes/edit', [EventController::class, 'admin_eventType_edit'])->name('admin_eventType_edit');
-    Route::post('/eventType/update/{id}', [EventController::class, 'admin_eventType_update']);
+    // Route::post('/eventTypes/edit', [EventController::class, 'admin_eventType_edit'])->name('admin_eventType_edit');
+    // Route::post('/eventType/update/{id}', [EventController::class, 'admin_eventType_update'])->name('admin_eventType_update');
     Route::get('/eventType/delete/{id}', [EventController::class, 'admin_eventType_delete']);
     Route::get('/eventTypes/create', [EventController::class, 'createEventType'])->name('createEventType');
+    Route::get('/eventTypes/{id}/edit', [EventController::class, 'editEventType'])->name('editEventType');
+
+    // Route::get('eventTypes/edit/{id}', [EventController::class, 'admin_editEventType'])->name('admin.editEventType');
+    // Route::get('/eventTypesEditType/{event}', [EventController::class, 'editEventType'])->name('admin.editEventType');
+
+    Route::post('/eventTypesUpdateType/{eventType}', [EventController::class, 'updateEventType'])->name('admin.updateEventType');
+    Route::get('/admin/eventTypes/edit/{id}', [EventController::class, 'editEventType'])->name('admin.editEventType');
+    Route::put('/admin/updateEventType/{eventType}', [EventController::class, 'updateEventType'])->name('admin.updateEventType');
+
+
+
+
 
 
     // Guest Capacity Routes
