@@ -34,7 +34,8 @@ class EventController extends Controller
     {
         $eventType = EventType::all();
         $data = compact('eventType');
-        return view('admin.eventTypes')->with($data);
+        // dd();
+        return view('admin.eventTypes', compact('eventType'))->with($data);
     }
 
     public function createEventType()
@@ -81,6 +82,56 @@ class EventController extends Controller
             return response()->json(['success' => 'Updated Successfully']);
         }
     }
+
+
+    // public function admin_editEventType($id)
+    // {
+    //     $eventType = EventType::find($id);
+    //     return view('admin.editEventType', compact('eventType'));
+    // }
+
+    public function editEventType($id)
+    {
+        $eventType = EventType::findOrFail($id);
+        return view('admin.editEventType', compact('eventType'));
+    }
+
+
+    public function updateEventType(EventType $eventType)
+    {
+        $validated = request()->validate([
+            'edit_eventTypeName' => 'required'
+        ]);
+
+        $eventType->update([
+            'event_type_name' => $validated['edit_eventTypeName']
+        ]);
+
+        return redirect()->route('admin.eventTypes')->with('success', 'Event Type Updated Successfully.');
+    }
+
+
+
+
+    // public function admin_editEventType($id)
+    // {
+    //     $eventType = EventType::findOrFail($id);
+    //     return view('admin.editEventType', compact('eventType'));
+    //     return view('admin.editEventType', compact('eventType'));
+    // }
+
+    // public function admin_editEventType($id)
+    // {
+    //     $eventType = EventType::findOrFail($id);
+    //     return view('admin.editEventType', compact('eventType'));
+    // }
+
+    // public function editEventType($id)
+    // {
+    //     $eventType = EventType::findOrFail($id);
+    //     return view('admin.edit', compact('eventType'));
+    // }
+
 
     public function admin_eventType_delete($id)
     {
