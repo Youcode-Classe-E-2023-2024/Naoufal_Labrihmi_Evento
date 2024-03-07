@@ -30,10 +30,23 @@ class HomeController extends Controller
         //   $events = Events::orderBy('event_id', 'desc')->where("event_subscription", "=", $paidEvents)->paginate(6);
         //   // $eventCount = $events->count();
         // }else{
-        $events = Events::orderBy('event_id', 'desc')->where('event_status', '=', 1)->paginate(6);
-        $paidEvents = Events::where('event_subscription', '=', 'P')->orderBy('event_id', 'desc')->paginate(5);
-        $freeEvents = Events::where('event_subscription', '=', 'F')->orderBy('event_id', 'desc')->paginate(5);
+        $events = Events::orderBy('event_id', 'desc')
+            ->where('event_status', '=', 1) // Only approved events
+            ->where('approved', 1) // Check if the event is approved
+            ->paginate(6);
+
+        $paidEvents = Events::where('event_subscription', '=', 'P')
+            ->orderBy('event_id', 'desc')
+            ->where('approved', 1) // Check if the event is approved
+            ->paginate(5);
+
+        $freeEvents = Events::where('event_subscription', '=', 'F')
+            ->orderBy('event_id', 'desc')
+            ->where('approved', 1) // Check if the event is approved
+            ->paginate(5);
+
         $eventCount = "";
+
         // }
 
         // $events = Events::all();
@@ -285,22 +298,38 @@ class HomeController extends Controller
         $locationUpcoming = $request['locationUpcoming'] ?? "";
 
         if ($search != "") {
-            $events = Events::orderBy('event_id', 'desc')->where("event_name", "LIKE", "%$search%")->orWhere("event_slug", "LIKE", "%$search%")->paginate(3);
+            $events = Events::orderBy('event_id', 'desc')
+                ->where("event_name", "LIKE", "%$search%")
+                ->orWhere("event_slug", "LIKE", "%$search%")
+                ->where('approved', 1) // Check if the event is approved
+                ->paginate(3);
             $eventCount = $events->count();
         } else if ($organizer != "") {
-            $events = Events::orderBy('event_id', 'desc')->where("event_author_id", "=", "$organizer")->paginate(12);
+            $events = Events::orderBy('event_id', 'desc')
+                ->where("event_author_id", "=", "$organizer")
+                ->where('approved', 1) // Check if the event is approved
+                ->paginate(12);
             $eventCount = $events->count();
         } else if ($location != "") {
-            $events = Events::orderBy('event_id', 'desc')->where("event_location", "=", "$location")->paginate(12);
+            $events = Events::orderBy('event_id', 'desc')
+                ->where("event_location", "=", "$location")
+                ->where('approved', 1) // Check if the event is approved
+                ->paginate(12);
             $eventCount = $events->count();
         } else if ($locationUpcoming != "") {
-            $getEvents = Events::orderBy('event_id', 'desc')->where('event_location', '=', $locationUpcoming);
+            $getEvents = Events::orderBy('event_id', 'desc')
+                ->where('event_location', '=', $locationUpcoming)
+                ->where('approved', 1); // Check if the event is approved
             $events = $getEvents->where('event_start_date', '>', date('Y-m-d'))->paginate(12);
             $eventCount = $events->count();
         } else {
-            $events = Events::orderBy('event_id', 'desc')->where('event_status', '=', 1)->paginate(12);
+            $events = Events::orderBy('event_id', 'desc')
+                ->where('event_status', '=', 1)
+                ->where('approved', 1) // Check if the event is approved
+                ->paginate(12);
             $eventCount = "";
         }
+
         $cities = Cities::all();
         $allOrganizers = Users::where('user_type', '=', 'OA')->get();
         $data = compact('events', 'cities', 'location', 'allOrganizers', 'search', 'eventCount', 'organizer');
@@ -309,6 +338,7 @@ class HomeController extends Controller
         // print_r($organizers->toArray());
         // die;
     }
+
 
     public function userProfile()
     {
