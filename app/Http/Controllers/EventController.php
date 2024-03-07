@@ -30,6 +30,15 @@ class EventController extends Controller
         $data = compact('eventList', 'paidEvents', 'freeEvents', 'eventImages');
         return view('admin.events')->with($data);
     }
+
+    public function approveEvent(Request $request, $eventId)
+    {
+        $event = Events::findOrFail($eventId);
+        $event->approved = !$event->approved; // Toggle the approval status
+        $event->save();
+
+        return redirect()->route('admin.events')->with('success', 'Event approval status updated successfully.');
+    }
     public function eventTypes()
     {
         $eventType = EventType::all();
@@ -254,6 +263,92 @@ class EventController extends Controller
     }
 
 
+    public function organizer_storeEvent(Request $request)
+    {
+        $request->validate([
+            'eventName' => 'required',
+            'eventLocation' => 'required',
+            'eventAddress' => 'required',
+            'startDate' => 'required',
+            'startTime' => 'required',
+            'endDate' => 'required',
+            'endTime' => 'required',
+            'guestCapacity' => 'required',
+            'eventSubscription' => 'required',
+            'eventDescription' => 'required',
+            'eventType' => 'required', // Add validation for event type selection
+            'files' => 'required',
+        ]);
+
+        $eventLocation = Custom::cityName($request['eventLocation']);
+        $slug = Custom::slug($request['eventName'] . " in " . $eventLocation . " " . time());
+
+        // Create a new event instance
+        $event = new Events;
+
+        // Assign values from the request to the event object
+        $event->event_name = $request['eventName'];
+        $event->event_location = $request['eventLocation'];
+        $event->event_address = $request['eventAddress'];
+        $event->event_start_date = $request['startDate'];
+        $event->event_start_time = $request['startTime'];
+        $event->event_end_date = $request['endDate'];
+        $event->event_end_time = $request['endTime'];
+        $event->event_guestCapacity = $request['guestCapacity'];
+        $event->event_subscription = $request['eventSubscription'];
+        if ($request['eventTicketPrice'] == "") {
+            $event->event_ticket_price = '0';
+        } else {
+            $event->event_ticket_price = $request['eventTicketPrice'];
+        }
+        $event->event_type_id = $request['eventType']; // Store the selected event type ID
+        $event->event_description = $request['eventDescription'];
+        $event->event_author_id = session()->get('user_id');
+        $event->event_slug = $slug;
+        $event->save();
+        $event_newId = $event->event_id;
+
+        // Image Uploading to the Other Table
+        if ($request['files'] != "") {
+            $i = 1;
+            foreach ($request->file('files') as $uploadImages) {
+                $eventImages = new EventImages;
+
+                $imageName = $event_newId . '_' . $i . '_' . time() . "." . $uploadImages->extension();
+                $uploadImages->move(public_path('Backend/event_images'), $imageName);
+                $eventImages->event_image_path = $imageName;
+                $eventImages->event_list_id = $event_newId;
+                $eventImages->save();
+                $i++;
+            }
+        }
+
+        // Notify followers about the new event
+        $followers = Followers::where('organizer_id', '=', session()->get('user_id'))->get();
+        $users = $followers->pluck('user_id');
+        foreach ($users as $key => $value) {
+            $notification = new Notification;
+            $notification->noti_title = 'Organizer: ' . session()->get('org_name') . ' created new Event';
+            $notification->noti_for = 'U';
+            $notification->noti_forId = $value;
+            $notification->noti_type = 'E';
+            $notification->noti_typeId = $event_newId;
+            $notification->noti_byId = session()->get('user_id');
+            $notification->save();
+        }
+
+        // Redirect the user to the appropriate route based on user type
+        if (session()->has('user_type') && session()->get('user_type') == 'A') {
+            // For admin users
+            $event->event_author_id = session()->get('admin_id');
+            return redirect()->route('admin.events')->with('success', 'Successfully Added');
+        } else {
+            return redirect()->route('org_events')->with('success', 'Successfully Added');
+        }
+    }
+
+
+
 
     public function admin_editEvent($id)
     {
@@ -402,13 +497,27 @@ class EventController extends Controller
         }
     }
 
+    // public function admin_createEvent()
+    // {
+    //     // Fetch event types with their events
+    //     $eventTypes = EventType::with('events')->get();
 
+    //     // Fetch other necessary data
+    //     $cities = Cities::all();
+    //     $images = EventImages::all();
+
+    //     // Pass data to the view
+    //     $data = compact('cities', 'eventTypes');
+    //     return view('admin.createEvent', $data);
+    // }
     public function create_event()
     {
+        $eventTypes = EventType::with('events')->get();
+
         $guestCapacity = GuestCapacity::all();
         $cities = Cities::all();
         $images = EventImages::all();
-        $data = compact('guestCapacity', 'cities');
+        $data = compact('guestCapacity', 'cities', 'eventTypes');
         return view('createEvent')->with($data);
     }
 
