@@ -51,7 +51,7 @@ Route::get('events/{slug}', [HomeController::class, 'eventDetails'])->name('even
 //Org Event Routes
 Route::get('myevents', [EventController::class, 'org_events'])->name('org_events')->middleware('org_guard');
 Route::get('create_event', [EventController::class, 'create_event'])->name('create_event')->middleware('org_guard');
-Route::post('create_event', [EventController::class, 'admin_storeEvent'])->name('create_event')->middleware('org_guard');
+Route::post('create_event', [EventController::class, 'organizer_storeEvent'])->name('create_event')->middleware('org_guard');
 Route::get('myevents/edit/{id}', [EventController::class, 'editEvent'])->name('editEvent')->middleware('org_guard');
 Route::post('myevents/edit/{id}', [EventController::class, 'admin_updateEvent'])->name('editEventImage');
 
@@ -152,6 +152,7 @@ Route::group(['middleware' => 'admin_guard', 'prefix' => 'admin'], function () {
     Route::get('edit_event/image/{id}', [EventController::class, 'admin_editImage'])->name('admin_editImage');
     Route::post('edit_event/{id}', [EventController::class, 'admin_updateEvent'])->name('editEventImage');
     Route::get('/events/delete/{id}', [EventController::class, 'deleteEvent'])->name('admin.deleteEvent');
+    Route::patch('/events/approve/{eventId}', [EventController::class, 'approveEvent'])->name('admin.approve.event');
 
     //EventTypes Routes
     Route::get('/eventTypes', [EventController::class, 'eventTypes'])->name('admin.eventTypes');
