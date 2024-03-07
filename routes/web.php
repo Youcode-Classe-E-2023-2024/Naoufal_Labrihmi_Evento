@@ -137,6 +137,11 @@ Route::group(['middleware' => 'admin_guard', 'prefix' => 'admin'], function () {
     Route::get('/users/delete/{id}', [UserController::class, 'admin_user_delete']);
     Route::post('/users/status_check', [UserController::class, 'status_check'])->name('status_check');
     Route::get('/users/{id}/edit', [UserController::class, 'admin_user_edit_view'])->name('admin_user_edit_view');
+    Route::get('/organizations/register', [UserController::class, 'registerFormOrganizateur'])->name('admin.register');
+    Route::post('/organizations/register', [UserController::class, 'admin_org_register'])->name('admin.organizations');
+    Route::get('/organizations/delete/{id}', [UserController::class, 'admin_org_delete']);
+    Route::get('/organizers/{id}/edit', [UserController::class, 'editOrganizer'])->name('admin.organizers.edit');
+    Route::put('/organizers/update/{id}', [UserController::class, 'updateOrganizer'])->name('admin.organizers.update');
 
 
     //Event Routes
