@@ -60,6 +60,8 @@ Route::get('myevents/delete/{id}', [EventController::class, 'deleteMyEvent'])->n
 
 Route::get('myTickets', [TicketController::class, 'org_tickets'])->name('org_tickets');
 Route::get('myTickets/{slug}', [TicketController::class, 'org_ticket_details'])->name('org_ticket_details');
+Route::put('/update-validation/{id}', [TicketController::class, 'updateStatus'])->name('updateValidation');
+
 
 Route::get('tickets/viewTicketDetails/{id}', [TicketController::class, 'viewTicketDetails'])->name('orgViewTicketDetails');
 
