@@ -111,6 +111,14 @@
                 </select>
             </div>
 
+            <div class="col-md-6 col-12 mb-3">
+                <label for="reservationMethod">Reservation Method</label>
+                <select class="form-control" id="reservationMethod" name="reservationMethod">
+                    <option value="automatic">Automatic Reservation</option>
+                    <option value="manual">Manual Reservation</option>
+                </select>
+            </div>
+
             <div class="col-md-12 col-12 mb-3">
                 <label for="eventDescription">Event Description</label>
                 <textarea name="eventDescription" id="eventDescription" class="form-control" cols="30" rows="10"></textarea>
