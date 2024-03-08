@@ -53,7 +53,7 @@ Route::get('myevents', [EventController::class, 'org_events'])->name('org_events
 Route::get('create_event', [EventController::class, 'create_event'])->name('create_event')->middleware('org_guard');
 Route::post('create_event', [EventController::class, 'organizer_storeEvent'])->name('create_event')->middleware('org_guard');
 Route::get('myevents/edit/{id}', [EventController::class, 'editEvent'])->name('editEvent')->middleware('org_guard');
-Route::post('myevents/edit/{id}', [EventController::class, 'admin_updateEvent'])->name('editEventImage');
+Route::post('myevents/edit/{id}', [EventController::class, 'org_updateEvent'])->name('editEventImage');
 
 Route::get('edit_event/image/{id}', [EventController::class, 'admin_editImage'])->name('admin_editImage');
 Route::get('myevents/delete/{id}', [EventController::class, 'deleteMyEvent'])->name('deleteMyEvent');
