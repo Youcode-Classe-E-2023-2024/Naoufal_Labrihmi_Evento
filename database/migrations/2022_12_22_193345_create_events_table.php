@@ -30,6 +30,7 @@ return new class extends Migration
             $table->boolean('event_status')->default(1); // Default status
             $table->boolean('approved')->default(0); // Approval status
             $table->longText('event_description');
+            $table->enum('event_reservation_method', ['automatic', 'manual']); // New column for reservation method
             $table->timestamps();
         });
     }
