@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Custom;
+use App\Mail\TicketValidated;
 use App\Models\BuyTickets;
 use App\Models\Cities;
 use App\Models\EventImages;
@@ -14,6 +15,7 @@ use App\Models\Organizer;
 use App\Models\User;
 use App\Models\Users;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class HomeController extends Controller
 {
@@ -117,51 +119,41 @@ class HomeController extends Controller
 
     public function buyEventTicket_details(Request $request)
     {
-        // checkArray($request);
         $request->validate([
             'buyerName' => 'required',
-            // 'buyerEmail' => 'required',
-            // 'buyerAddress' => 'required',
-            // 'buyerContact' => 'required',
             'buyerCnic' => 'required',
-            // 'buyerComment' => 'required',
-            // 'buyerPaymentMethod' => 'required',
             'buyerTicketPrice' => 'required',
+            'buyerEmail' => 'required',
         ]);
 
-        // $buyerName = $request->input('buyerName', []);
-        // $buyerEmail = $request->input('buyerEmail', []);
-        // $buyerAddress = $request->input('buyerAddress', []);
-        // $buyerContact = $request->input('buyerContact', []);
-        // $buyerComment = $request->input('buyerComment', []);
-        // $buyerPaymentMethod = $request->input('buyerPaymentMethod', []);
-        // checkArray($request);
         $quantity = $request['quantity'];
 
         $newCategoryArray = [
             "buyer_user_name" => $request->input('buyerName', []),
-            //  "buyer_user_email"=> $request->input('buyerEmail', []),
-            //  'buyer_user_address' =>  $request->input('buyerAddress', []),
-            //  "buyer_user_contact"=>  $request->input('buyerContact', []),
             "buyer_user_cnic" =>  $request->input('buyerCnic', []),
-            //  "buyer_user_comment"=>  $request->input('buyerComment', []),
-            //  "buyer_user_payment_method"=> $request->input('buyerPaymentMethod', []),
             "buyer_user_payment_method" => $request['buyerPaymentMethod'],
             "buyer_user_ticket_price" => $request['buyerTicketPrice'],
+            "buyer_user_email" => $request->input('buyerEmail', []),
             "buyer_user_id" => session()->get('user_id'),
             "buyer_event_id" => $request['buyerEventId'],
             "buyer_event_author_id" => $request['buyerEventAuthorId'],
         ];
-        // $totalRecords = count($newCategoryArray['buyer_user_name']);
+
+        // Determine the event's reservation method
+        $event = Events::find($request['buyerEventId']);
+        $reservationMethod = $event->event_reservation_method;
+
+        // Set validation column based on reservation method
+        $validation = ($reservationMethod == 'automatic') ? 1 : 0;
+
+        $ticketId = [];
+
         foreach ($request->input('buyerName', []) as $key => $value) {
-            # code...
             $buyTicket = new BuyTickets;
             $buyTicket->buyer_user_name = $newCategoryArray['buyer_user_name'][$key];
-            // $buyTicket->buyer_user_email = $newCategoryArray['buyer_user_email'][$key];
-            // $buyTicket->buyer_user_address = $newCategoryArray['buyer_user_address'][$key];
-            // $buyTicket->buyer_user_contact = $newCategoryArray['buyer_user_contact'][$key];
+            $buyTicket->buyer_user_email = $newCategoryArray['buyer_user_email'][$key];
             $buyTicket->buyer_user_cnic = $newCategoryArray['buyer_user_cnic'][$key];
-            // $buyTicket->buyer_user_comment = $newCategoryArray['buyer_user_comment'][$key];
+
             if ($request['buyerPaymentMethod'] != "") {
                 $buyTicket->buyer_user_payment_method = $request['buyerPaymentMethod'];
                 $buyTicket->buyer_user_payment_status = 'UP';
@@ -169,16 +161,22 @@ class HomeController extends Controller
                 $buyTicket->buyer_user_payment_method = 'N/A';
                 $buyTicket->buyer_user_payment_status = 'P';
             }
+
             $buyTicket->buyer_user_ticket_price = $newCategoryArray['buyer_user_ticket_price'];
             $buyTicket->buyer_user_id = $newCategoryArray['buyer_user_id'];
             $buyTicket->buyer_event_id = $newCategoryArray['buyer_event_id'];
             $buyTicket->buyer_event_author_id = $newCategoryArray['buyer_event_author_id'];
 
+            $buyTicket->validation = $validation; // Set the validation status
+
             $buyTicket->save();
             $ticketId[] = $buyTicket->buy_ticket_id;
 
+
+
+            // Create notification
             $notification = new Notification;
-            $notification->noti_title = 'Ticket Sold: ' . $buyTicket->buyer_user_name . ' Buy your Event ' . Custom::getEventTitle($buyTicket->buyer_event_id) . ' Ticket';
+            $notification->noti_title = 'Ticket Sold: ' . $buyTicket->buyer_user_name . ' bought a ticket for ' . Custom::getEventTitle($buyTicket->buyer_event_id);
             $notification->noti_for = 'OA';
             $notification->noti_forId = $buyTicket->buyer_event_author_id;
             $notification->noti_type = 'T';
@@ -189,6 +187,15 @@ class HomeController extends Controller
 
         //  check($ticketId);
         if ($buyTicket) {
+            // If validation is automatic, send confirmation message
+            if ($validation == 1) {
+                foreach ($ticketId as $id) {
+                    $ticket = BuyTickets::find($id);
+                    if ($ticket->buyer_user_email) {
+                        Mail::to($ticket->buyer_user_email)->send(new TicketValidated($ticket));
+                    }
+                }
+            }
             if ($request['payNow'] == 'P') {
                 $eventData = Events::where('event_id', '=', $request['buyerEventId'])->first();
                 $eventId = $eventData->event_id;
@@ -213,6 +220,7 @@ class HomeController extends Controller
             return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
+
 
     public function payment_confirmed(Request $request)
     {
