@@ -10,6 +10,8 @@ use App\Custom;
 use App\Mail\TicketValidated;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\HomeController;
+
 
 class TicketController extends Controller
 {
@@ -58,7 +60,10 @@ class TicketController extends Controller
     }
     public function updateStatus($id, Request $request)
     {
+        $homeController = new HomeController();
         $ticket = BuyTickets::findOrFail($id);
+        $event = Events::find($ticket->buyer_event_id);
+        $qrCode = $homeController->generateQRCode($ticket);
 
         // Check if the logged-in user is authorized to update the ticket status
         $authorizedUser = DB::table('users')
@@ -90,7 +95,7 @@ class TicketController extends Controller
             $ticket->validation = '1';
             $ticket->save();
 
-            Mail::to($ticket->buyer_user_email)->send(new TicketValidated($ticket));
+            Mail::to($ticket->buyer_user_email)->send(new TicketValidated($ticket, $qrCode, $event));
 
             // Redirect back or return a success response
             return redirect()->back()->with('success', 'Ticket status updated successfully.');

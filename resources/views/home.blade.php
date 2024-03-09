@@ -48,7 +48,7 @@
                             <select class="form-select border-0 py-3" name="location" onchange="this.form.submit()">
                                 <option value="">Location</option>
                                 @foreach ($cities as $city)
-                                <option value="{{$city->id}}">{{$city->city}}</option>
+                                <option value="{{$city->id}}">{{$city->name}}</option>
                                 @endforeach
                             </select>
                         </div>

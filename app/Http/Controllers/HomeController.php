@@ -40,11 +40,13 @@ class HomeController extends Controller
             ->paginate(6);
 
         $paidEvents = Events::where('event_subscription', '=', 'P')
+            ->where('event_status', '=', 1) // Only approved events
             ->orderBy('event_id', 'desc')
             ->where('approved', 1) // Check if the event is approved
             ->paginate(5);
 
         $freeEvents = Events::where('event_subscription', '=', 'F')
+            ->where('event_status', '=', 1) // Only approved events
             ->orderBy('event_id', 'desc')
             ->where('approved', 1) // Check if the event is approved
             ->paginate(5);
@@ -321,7 +323,6 @@ class HomeController extends Controller
         $data = compact('eventList', 'totalEvents', 'soldTickets', 'soldTicketsCount', 'totalEarnings');
         return view('dashboard')->with($data);
     }
-
     public function events(Request $request)
     {
         $search = $request['search'] ?? "";
@@ -334,31 +335,31 @@ class HomeController extends Controller
                 ->where("event_name", "LIKE", "%$search%")
                 ->orWhere("event_slug", "LIKE", "%$search%")
                 ->where('approved', 1) // Check if the event is approved
-                ->paginate(3);
-            $eventCount = $events->count();
+                ->paginate(6); // Pagination added here
+            $eventCount = $events->total();
         } else if ($organizer != "") {
             $events = Events::orderBy('event_id', 'desc')
                 ->where("event_author_id", "=", "$organizer")
                 ->where('approved', 1) // Check if the event is approved
-                ->paginate(12);
-            $eventCount = $events->count();
+                ->paginate(6); // Pagination added here
+            $eventCount = $events->total();
         } else if ($location != "") {
             $events = Events::orderBy('event_id', 'desc')
                 ->where("event_location", "=", "$location")
                 ->where('approved', 1) // Check if the event is approved
-                ->paginate(12);
-            $eventCount = $events->count();
+                ->paginate(6); // Pagination added here
+            $eventCount = $events->total();
         } else if ($locationUpcoming != "") {
             $getEvents = Events::orderBy('event_id', 'desc')
                 ->where('event_location', '=', $locationUpcoming)
                 ->where('approved', 1); // Check if the event is approved
-            $events = $getEvents->where('event_start_date', '>', date('Y-m-d'))->paginate(12);
-            $eventCount = $events->count();
+            $events = $getEvents->where('event_start_date', '>', date('Y-m-d'))->paginate(6); // Pagination added here
+            $eventCount = $events->total();
         } else {
             $events = Events::orderBy('event_id', 'desc')
                 ->where('event_status', '=', 1)
                 ->where('approved', 1) // Check if the event is approved
-                ->paginate(12);
+                ->paginate(6); // Pagination added here
             $eventCount = "";
         }
 
@@ -370,6 +371,7 @@ class HomeController extends Controller
         // print_r($organizers->toArray());
         // die;
     }
+
 
 
     public function userProfile()
