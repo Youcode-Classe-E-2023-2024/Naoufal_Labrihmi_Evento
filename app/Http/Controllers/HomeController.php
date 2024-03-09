@@ -9,6 +9,7 @@ use App\Models\Cities;
 use App\Models\EventImages;
 use App\Models\eventReviews;
 use App\Models\Events;
+use App\Models\EventType;
 use App\Models\Followers;
 use App\Models\Notification;
 use App\Models\Organizer;
@@ -23,17 +24,6 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        // $featured = $request['featured'] ?? "";
-        // $freeEvents = $request['freeEvents'] ?? "";
-        // $paidEvents = $request['paidEvents'] ?? "";
-
-        // if($freeEvents != ""){
-        //   $events = Events::orderBy('event_id', 'desc')->where("event_subscription", "=", $freeEvents)->paginate(6);
-        //   // $eventCount = $events->count();
-        // }else if($paidEvents != ""){
-        //   $events = Events::orderBy('event_id', 'desc')->where("event_subscription", "=", $paidEvents)->paginate(6);
-        //   // $eventCount = $events->count();
-        // }else{
         $events = Events::orderBy('event_id', 'desc')
             ->where('event_status', '=', 1) // Only approved events
             ->where('approved', 1) // Check if the event is approved
@@ -53,11 +43,10 @@ class HomeController extends Controller
 
         $eventCount = "";
 
-        // }
-
-        // $events = Events::all();
+        // Retrieve all event images
         $eventImages = EventImages::all();
 
+        // Count events for each location
         $islamabadEvents = Events::where('event_location', '=', 6)->get();
         $islamabad = $islamabadEvents->where('event_start_date', '>', date('Y-m-d'))->count();
         $lahoreEvents = Events::where('event_location', '=', 14)->get();
@@ -67,12 +56,36 @@ class HomeController extends Controller
         $multanEvents = Events::where('event_location', '=', 38)->get();
         $multan = $multanEvents->where('event_start_date', '>', date('Y-m-d'))->count();
 
+        // Retrieve all organizers
         $allOrganizers = Users::where('user_type', '=', 'OA')->get();
+
+        // Retrieve all cities
         $cities = Cities::all();
 
-        $data = compact('events', 'paidEvents', 'freeEvents', 'eventImages', 'islamabad', 'lahore', 'karachi', 'multan', 'allOrganizers', 'cities');
+        // Retrieve the selected event type from the request
+        $selectedEventType = $request->input('eventType', '');
+
+        // Retrieve all event types
+        $eventTypes = EventType::all();
+
+        $data = compact(
+            'events',
+            'paidEvents',
+            'freeEvents',
+            'eventImages',
+            'islamabad',
+            'lahore',
+            'karachi',
+            'multan',
+            'allOrganizers',
+            'cities',
+            'eventTypes',
+            'selectedEventType'
+        );
+
         return view('home')->with($data);
     }
+
 
 
 
@@ -329,47 +342,44 @@ class HomeController extends Controller
         $organizer = $request['organizer'] ?? "";
         $location = $request['location'] ?? "";
         $locationUpcoming = $request['locationUpcoming'] ?? "";
+        $eventType = $request['eventType'] ?? ""; // Add this line
 
-        if ($search != "") {
-            $events = Events::orderBy('event_id', 'desc')
-                ->where("event_name", "LIKE", "%$search%")
-                ->orWhere("event_slug", "LIKE", "%$search%")
-                ->where('approved', 1) // Check if the event is approved
-                ->paginate(6); // Pagination added here
-            $eventCount = $events->total();
-        } else if ($organizer != "") {
-            $events = Events::orderBy('event_id', 'desc')
-                ->where("event_author_id", "=", "$organizer")
-                ->where('approved', 1) // Check if the event is approved
-                ->paginate(6); // Pagination added here
-            $eventCount = $events->total();
-        } else if ($location != "") {
-            $events = Events::orderBy('event_id', 'desc')
-                ->where("event_location", "=", "$location")
-                ->where('approved', 1) // Check if the event is approved
-                ->paginate(6); // Pagination added here
-            $eventCount = $events->total();
-        } else if ($locationUpcoming != "") {
-            $getEvents = Events::orderBy('event_id', 'desc')
-                ->where('event_location', '=', $locationUpcoming)
-                ->where('approved', 1); // Check if the event is approved
-            $events = $getEvents->where('event_start_date', '>', date('Y-m-d'))->paginate(6); // Pagination added here
-            $eventCount = $events->total();
-        } else {
-            $events = Events::orderBy('event_id', 'desc')
-                ->where('event_status', '=', 1)
-                ->where('approved', 1) // Check if the event is approved
-                ->paginate(6); // Pagination added here
-            $eventCount = "";
-        }
+        $events = Events::orderBy('event_id', 'desc')
+            ->where('approved', 1) // Check if the event is approved
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where("event_name", "LIKE", "%$search%")
+                        ->orWhere("event_slug", "LIKE", "%$search%");
+                });
+            })
+            ->when($organizer, function ($query) use ($organizer) {
+                $query->where("event_author_id", "=", $organizer);
+            })
+            ->when($location, function ($query) use ($location) {
+                $query->where("event_location", "=", $location);
+            })
+            ->when($locationUpcoming, function ($query) use ($locationUpcoming) {
+                $query->where('event_location', '=', $locationUpcoming)
+                    ->where('event_start_date', '>', date('Y-m-d'));
+            })
+            ->when($eventType, function ($query) use ($eventType) { // Add this condition
+                $query->whereHas('eventType', function ($query) use ($eventType) {
+                    $query->where('event_type_name', '=', $eventType);
+                });
+            })
+            ->paginate(6); // Pagination added here
+
+        $eventCount = $events->total();
+
+        // Retrieve the selected event type from the request
+        $selectedEventType = $request->input('eventType', '');
 
         $cities = Cities::all();
         $allOrganizers = Users::where('user_type', '=', 'OA')->get();
-        $data = compact('events', 'cities', 'location', 'allOrganizers', 'search', 'eventCount', 'organizer');
+        $eventTypes = EventType::all(); // Fetch all event types
+
+        $data = compact('events', 'cities', 'location', 'allOrganizers', 'search', 'eventCount', 'organizer', 'eventTypes', 'selectedEventType');
         return view('events')->with($data);
-        // echo '<pre>';
-        // print_r($organizers->toArray());
-        // die;
     }
 
 
