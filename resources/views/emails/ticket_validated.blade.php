@@ -1,9 +1,9 @@
-<!-- resources/views/emails/ticket_validated.blade.php -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Ticket Validated</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
 <style>
@@ -21,7 +21,7 @@
         height: 100vh;
         display: grid;
         font-family: "Staatliches", cursive;
-        background: #d83565;
+        background: gray;
         color: black;
         font-size: 14px;
         letter-spacing: 0.1em;
@@ -102,6 +102,7 @@
 
     .date span:last-child {
         text-align: right;
+        width: 100%;
     }
 
     .date .june-29 {
@@ -183,6 +184,7 @@
 
     .barcode {
         height: 100px;
+        margin-left: 190px;
     }
 
     .barcode img {
@@ -195,14 +197,6 @@
 </style>
 
 <body>
-    <h2>Your ticket has been validated</h2>
-    <p>Dear {{ $ticket->buyer_user_name }},</p>
-    <p>We are pleased to inform you that your ticket for the event "hh" has been successfully validated.</p>
-    <p>Thank you for your participation!</p>
-
-
-
-
     <div class="ticket created-by-anniedotexe">
         <div class="left">
             <div class="image">
@@ -212,27 +206,23 @@
                     <span>ADMIT ONE</span>
                 </p>
                 <div class="ticket-number">
-                    <!-- <p>
-                        #20030220
-                    </p> -->
+                    <p>
+                    </p>
                 </div>
             </div>
             <div class="ticket-info">
                 <p class="date">
-                    <span>TUESDAY</span>
-                    <span class="june-29">JUNE 29TH</span>
-                    <span>2021</span>
+                    <span class="june-29">{{ $event->event_start_date }} To {{$event->event_end_date}}</span>
                 </p>
                 <div class="show-name">
-                    <h1>SOUR Prom</h1>
+                    <h1>{{ $event->event_name }}</h1>
                     <h2>{{ $ticket->buyer_user_name }}</h2>
                 </div>
                 <div class="time">
-                    <p>8:00 PM <span>TO</span> 11:00 PM</p>
-                    <p>DOORS <span>@</span> 7:00 PM</p>
+                    <p>{{ $event->event_start_time }} <span>TO </span>{{ $event->event_end_time }}</p>
                 </div>
-                <p class="location"><span>East High School</span>
-                    <span class="separator"><i class="far fa-smile"></i></span><span>Salt Lake City, Utah</span>
+                <p class="location"><span>Welcome To </span>
+                    <span class="separator"><i class="far fa-smile"></i></span><span> Our Event</span>
                 </p>
             </div>
         </div>
@@ -244,18 +234,12 @@
             </p>
             <div class="right-info-container">
                 <div class="show-name">
-                    <h1>SOUR Prom</h1>
+                    <h1>{{ $event->event_name }}</h1>
                 </div>
                 <div class="time">
-                    <p>8:00 PM <span>TO</span> 11:00 PM</p>
-                    <p>DOORS <span>@</span> 7:00 PM</p>
+                    <p>{{ $event->event_start_time }} <span>TO </span>{{ $event->event_end_time }}</p>
                 </div>
-                <!-- <div class="barcode">
-                    <img src="https://external-preview.redd.it/cg8k976AV52mDvDb5jDVJABPrSZ3tpi1aXhPjgcDTbw.png?auto=webp&s=1c205ba303c1fa0370b813ea83b9e1bddb7215eb" alt="QR code">
-                </div> -->
-                <!-- <p class="ticket-number">
-                    #20030220 -->
-                </p>
+                <svg class="barcode" src="data:image/png;base64,{{ $qrCode }}"></svg>
             </div>
         </div>
     </div>

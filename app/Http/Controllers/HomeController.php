@@ -16,6 +16,8 @@ use App\Models\User;
 use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
 
 class HomeController extends Controller
 {
@@ -117,6 +119,25 @@ class HomeController extends Controller
         }
     }
 
+    public function generateQRCode($ticket)
+    {
+        $event = Events::find($ticket->buyer_event_id);
+        // Generate QR code content
+        $qrCodeContent = "Name: " . $ticket->buyer_user_name . "\n";
+        $qrCodeContent .= "Email: " . $ticket->buyer_user_email . "\n";
+        $qrCodeContent .= "Event: " . $event->event_name;
+        $from = [255, 0, 0];
+        $to = [0, 0, 255];
+        // Generate QR code image
+        $qrCode = QrCode::size(100)
+            ->style('dot')
+            ->eye('circle')
+            ->gradient($from[0], $from[1], $from[2], $to[0], $to[1], $to[2], 'diagonal')
+            ->generate($qrCodeContent);
+
+        return $qrCode;
+    }
+
     public function buyEventTicket_details(Request $request)
     {
         $request->validate([
@@ -185,14 +206,14 @@ class HomeController extends Controller
             $notification->save();
         }
 
-        //  check($ticketId);
         if ($buyTicket) {
             // If validation is automatic, send confirmation message
             if ($validation == 1) {
                 foreach ($ticketId as $id) {
                     $ticket = BuyTickets::find($id);
+                    $qrCode = $this->generateQRCode($ticket);
                     if ($ticket->buyer_user_email) {
-                        Mail::to($ticket->buyer_user_email)->send(new TicketValidated($ticket));
+                        Mail::to($ticket->buyer_user_email)->send(new TicketValidated($ticket, $qrCode, $event));
                     }
                 }
             }
@@ -220,6 +241,9 @@ class HomeController extends Controller
             return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
+
+
+
 
 
     public function payment_confirmed(Request $request)
