@@ -99,6 +99,8 @@ return [
         'livewire*',
         'nova-api*',
         'pulse*',
+        'serviceworker.js',
+        'Backend/js/jquery.imagesloader.css'
     ],
 
     'ignore_commands' => [
