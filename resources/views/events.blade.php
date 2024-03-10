@@ -5,46 +5,40 @@
 <!-- Search Start -->
 <div class="container-fluid bg-primary mb-5 wow fadeIn" data-wow-delay="0.1s" style="padding: 35px;">
     <div class="container">
-        <div class="row g-2 align-items-center">
-            <div class="col-md-8">
-                <form action="{{url('events')}}" method="get" class="row g-2">
-                    <div class="col-md-4">
-                        <input type="text" name="search" id="search" class="form-control border-0 py-3" placeholder="Search By Keyword" @if ($search !="" ) value="{{$search}}" @endif>
-                    </div>
-                    <div class="col-md-4">
-                        <select class="form-select border-0 py-3" name="organizer" onchange="this.form.submit()">
-                            <option value="">Event Organizers</option>
-                            @foreach ($allOrganizers as $org)
-                            <option value="{{$org->id}}">{{$org->org_name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <select class="form-select border-0 py-3" name="location" onchange="this.form.submit()">
-                            <option value="">Location</option>
-                            @foreach ($cities as $city)
-                            <option value="{{$city->id}}" @if ($location !="" ) @if ($location==$city->id)
-                                selected
-                                @endif
-                                @endif>{{$city->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <select class="form-select border-0 py-3" name="eventType" onchange="this.form.submit()">
-                            <option value="">Event Types</option>
-                            @foreach ($eventTypes as $eventType)
-                            <option value="{{$eventType->event_type_name}}" @if ($selectedEventType==$eventType->event_type_name) selected @endif>{{$eventType->event_type_name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-dark border-0 w-100 py-3"> Search </button>
-                    </div>
-                </form>
+        <form action="{{url('events')}}" method="get">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-3">
+                    <input type="text" name="search" id="search" class="form-control border-0 py-4" placeholder="Search By Keyword">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select border-0 py-3" name="organizer" onchange="this.form.submit()">
+                        <option value="">Event Organizers</option>
+                        @foreach ($allOrganizers as $org)
+                        <option value="{{$org->id}}">{{$org->org_name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select border-0 py-3" name="location" onchange="this.form.submit()">
+                        <option value="">Location</option>
+                        @foreach ($cities as $city)
+                        <option value="{{$city->id}}">{{$city->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select border-0 py-3" name="eventType" onchange="this.form.submit()">
+                        <option value="">Event Types</option>
+                        @foreach ($eventTypes as $eventType)
+                        <option value="{{$eventType->event_type_name}}" @if ($selectedEventType==$eventType->event_type_name) selected @endif>{{$eventType->event_type_name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-dark border-0 w-100 py-3">Search</button>
+                </div>
             </div>
-
-        </div>
+        </form>
     </div>
 </div>
 

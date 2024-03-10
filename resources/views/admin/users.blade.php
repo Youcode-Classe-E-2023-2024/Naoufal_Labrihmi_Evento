@@ -56,7 +56,7 @@
                                         <!-- <button type="button" class="btn btn-primary editmodalbtn" data-toggle="modal" data-target="#editModal" data-id="{{$user->id}}">
                                     <i class="fa fa-edit"></i>
                                   </button> -->
-                                        <a href="{{ route('admin_user_edit_view', $user->id) }}" class="btn btn-primary m-1"><i class="fa fa-eye"></i></a>
+                                        <a href="{{ route('admin_user_edit_view', $user->id) }}" class="btn btn-primary m-1"><i class="fa fa-edit"></i></a>
                                         <a href="{{url('admin/users/delete')}}/{{$user->id}}" class="btn btn-danger m-1 deleteBtn "><i class="fa fa-trash"></i></a>
                                     </td>
                                 </tr>

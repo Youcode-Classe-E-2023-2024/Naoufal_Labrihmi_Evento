@@ -16,6 +16,7 @@ use App\Models\Notification;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Foundation\Console\EventListCommand;
+use Illuminate\Support\Facades\Session;
 
 class EventController extends Controller
 {
@@ -61,12 +62,24 @@ class EventController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->messages()]);
         } else {
-            $eventType = new EventType;
-            $eventType->event_type_name = $request['eventTypeName'];
-            $eventType->save();
-            return redirect()->route('admin.eventTypes')->with('success', 'Event Type has been Added Successfully.');
+            // Check if the event type already exists
+            $eventTypeExists = EventType::where('event_type_name', $request['eventTypeName'])->exists();
+
+            if ($eventTypeExists) {
+                // If the event type already exists, set a message in the session
+                Session::flash('error', 'Categorie already exists.');
+            } else {
+                // If the event type does not exist, create a new one
+                $eventType = new EventType;
+                $eventType->event_type_name = $request['eventTypeName'];
+                $eventType->save();
+                Session::flash('success', 'Categorie has been Added Successfully.');
+            }
+
+            return redirect()->route('admin.eventTypes');
         }
     }
+
 
     public function admin_eventType_edit(Request $request)
     {
@@ -116,7 +129,7 @@ class EventController extends Controller
             'event_type_name' => $validated['edit_eventTypeName']
         ]);
 
-        return redirect()->route('admin.eventTypes')->with('success', 'Event Type Updated Successfully.');
+        return redirect()->route('admin.eventTypes')->with('success', 'Categorie Updated Successfully.');
     }
 
 
@@ -158,9 +171,9 @@ class EventController extends Controller
             // Delete the event type itself
             $eventType->delete();
 
-            return redirect()->route('admin.eventTypes')->with('success', 'Event Type and associated events have been deleted successfully.');
+            return redirect()->route('admin.eventTypes')->with('success', 'Categorie and associated events have been deleted successfully.');
         } else {
-            return redirect()->route('admin.eventTypes')->with('error', 'Event Type not found.');
+            return redirect()->route('admin.eventTypes')->with('error', 'Categorie not found.');
         }
     }
 

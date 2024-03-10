@@ -11,6 +11,7 @@ use App\Mail\TicketValidated;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\HomeController;
+use Dompdf\Dompdf;
 
 
 class TicketController extends Controller
@@ -58,6 +59,9 @@ class TicketController extends Controller
             ]);
         }
     }
+
+
+
     public function updateStatus($id, Request $request)
     {
         $homeController = new HomeController();

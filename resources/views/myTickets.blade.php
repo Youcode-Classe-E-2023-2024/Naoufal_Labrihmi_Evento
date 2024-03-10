@@ -33,7 +33,8 @@
                                     <th>Ticket Payment</th>
                                     <th>Payment Status</th>
                                     <th>Buying at</th>
-                                    <th>Validation</th> <!-- New column header -->
+                                    <th>Validation</th>
+                                    <th>Download Ticket</th> <!-- New column -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -82,6 +83,15 @@
                                         @else
                                         <!-- Display "Validé" badge only if the validation is not 0 -->
                                         <span class="badge bg-success">Validé</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($ticket->validation == 1)
+                                        <!-- Display the download button if the ticket is validated -->
+                                        <a href="{{ route('downloadTicketPDF', ['id' => $ticket->buy_ticket_id]) }}" class="btn btn-primary">Download Ticket</a>
+                                        @else
+                                        <!-- Display a symbol indicating the ticket cannot be downloaded -->
+                                        <i class="fas fa-hourglass text-warning text-center"></i> <!-- Use a yellow hourglass icon -->
                                         @endif
                                     </td>
                                 </tr>

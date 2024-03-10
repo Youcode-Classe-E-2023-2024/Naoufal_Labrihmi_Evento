@@ -68,19 +68,14 @@
                                         @endif
                                     </td>
                                     <td>{{$event->event_guestCapacity}}</td>
-                                    <td>
-                                        <div class="switch_box box_1">
-                                            <input type="checkbox" class="switch_1 user_status" {{$event->event_status == true ? 'checked' : "" }} data-id="{{$event->event_id}}">
-                                        </div>
-                                    </td>
+
                                     <td>
                                         @if($event->approved)
                                         <span class="badge badge-success">Approved</span>
                                         @else
                                         <span class="badge badge-warning">Pending</span>
                                         @endif
-                                    </td>
-                                    <td>
+
                                         <form action="{{ route('admin.approve.event', $event->event_id) }}" method="POST">
                                             @csrf
                                             @method('PATCH')

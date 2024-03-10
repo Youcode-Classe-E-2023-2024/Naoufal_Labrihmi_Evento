@@ -80,6 +80,7 @@ Route::get('myProfile/{id}', [HomeController::class, 'viewUserProfile'])->name('
 Route::post('myProfile/{id}', [HomeController::class, 'admin_updateUserProfile'])->name('admin_updateUserProfile');
 Route::post('user_following_check', [FollowersController::class, 'user_following_check'])->name('user_following_check')->middleware('unAuth_guard');
 Route::post('user_following_remove', [FollowersController::class, 'user_following_remove'])->name('user_following_remove')->middleware('unAuth_guard');
+Route::get('download-ticket-pdf/{id}', [HomeController::class, 'downloadTicketPDF'])->name('downloadTicketPDF');
 
 //Organizer Profile Routes
 Route::get('organizers', [HomeController::class, 'allOrganizers'])->name('allOrganizers');

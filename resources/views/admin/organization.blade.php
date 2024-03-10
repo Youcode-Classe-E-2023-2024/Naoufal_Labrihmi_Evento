@@ -38,7 +38,6 @@
                                     <th>Contact</th>
                                     <th>Address</th>
                                     <th>Website</th>
-                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -55,12 +54,7 @@
                                     <td>{{$user->contact}}</td>
                                     <td>{{$user->address}}</td>
                                     <td>{{$user->website}}</td>
-                                    <td>
-                                        <div class="switch_box box_1">
-                                            <input type="checkbox" class="switch_1 user_status" {{$user->status == true ? 'checked' : "" }} data-id="{{$user->id}}">
-                                        </div>
-                                        {{-- {{status($user->status)}} --}}
-                                    </td>
+
                                     <td>
                                         <a href="{{ route('admin.organizers.edit', ['id' => $user->id]) }}" class="btn btn-primary">
                                             <i class="fa fa-edit"></i>

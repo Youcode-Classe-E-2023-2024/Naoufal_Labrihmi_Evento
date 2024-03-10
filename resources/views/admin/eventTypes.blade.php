@@ -2,7 +2,7 @@
 
 @section('content')
 
-<d iv class="container mt-3">
+<div class="container mt-3">
     <h2>All Events Categories</h2>
     <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iusto nemo totam commodi, dolorem quia quaerat mollitia sint nulla recusandae quam!</p>
     <div class="row">
@@ -21,8 +21,7 @@
                         <!-- Button trigger modal -->
                         <a href="{{ route('createEventType') }}" class="btn btn-primary">Create Event Type</a>
 
-                        {{-- <div></div> --}}
-                        <button class="btn btn-light refreshBtn">Refresh <i class="fa fa-refresh fetch-users"></i></button>
+
                     </div>
                 </div>
                 <div class="table_section padding_infor_info">
@@ -71,88 +70,86 @@
             </div>
         </div>
     </div>
-    </div>
+</div>
 
 
-
-
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" r ole="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">New Event Type</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container">
-                        <div id="save_errList"></div>
-                    </div>
-                    <div class="container-fluid">
-                        <form action="{{route('eventTypes_register')}}" method="post" id="eventTypeForm">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="eventTypeName" class="form-label">Event Type Name</label>
-                                <input type="text" class="form-control" name="eventTypeName" id="eventTypeName" aria-describedby="helpId" placeholder="">
-                                <small id="helpId" class="form-text text-muted">@error('eventTypeName')
-                                    {{$message}}
-                                    @enderror</small>
-                            </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" data-dismiss="modal" class="btn btn-primary eventTypeName-btn">Save changes</button>
-                </div>
-                </form>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" r ole="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New Event Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div id="save_errList"></div>
+                </div>
+                <div class="container-fluid">
+                    <form action="{{route('eventTypes_register')}}" method="post" id="eventTypeForm">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="eventTypeName" class="form-label">Event Type Name</label>
+                            <input type="text" class="form-control" name="eventTypeName" id="eventTypeName" aria-describedby="helpId" placeholder="">
+                            <small id="helpId" class="form-text text-muted">@error('eventTypeName')
+                                {{$message}}
+                                @enderror</small>
+                        </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" data-dismiss="modal" class="btn btn-primary eventTypeName-btn">Save changes</button>
+            </div>
+            </form>
         </div>
     </div>
+</div>
 
 
-    {{-- Edit User Modal  --}}
+{{-- Edit User Modal  --}}
 
-    <!-- Modal -->
-    <div class="modal fade" id="editEventTypeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit User</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <form action="" method="post" id="updateEventTypeForm">
-                            @csrf
-                            <div class="mb-3">
-                                <input type="hidden" value="" id="eventType_id">
-                                <label for="edit_eventTypeName" class="form-label">Name</label>
-                                <input type="text" class="form-control" name="edit_eventTypeName" id="edit_eventTypeName" aria-describedby="helpId" placeholder="">
-                                <small id="helpId" class="form-text text-muted">@error('edit_eventTypeName')
-                                    {{$message}}
-                                    @enderror</small>
-                            </div>
-
-
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-s                   econdary" data-dismiss="modal">C lose</button>
-                    <button type="button" class="btn btn-primary update_eventTypeName">Save changes</button>
-                </div>
-                </form>
+<!-- Modal -->
+<div class="modal fade" id="editEventTypeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <form action="" method="post" id="updateEventTypeForm">
+                        @csrf
+                        <div class="mb-3">
+                            <input type="hidden" value="" id="eventType_id">
+                            <label for="edit_eventTypeName" class="form-label">Name</label>
+                            <input type="text" class="form-control" name="edit_eventTypeName" id="edit_eventTypeName" aria-describedby="helpId" placeholder="">
+                            <small id="helpId" class="form-text text-muted">@error('edit_eventTypeName')
+                                {{$message}}
+                                @enderror</small>
+                        </div>
+
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-s                   econdary" data-dismiss="modal">C lose</button>
+                <button type="button" class="btn btn-primary update_eventTypeName">Save changes</button>
+            </div>
+            </form>
         </div>
     </div>
+</div>
 
 
-    @section('script')
+@section('script')
 
-    @endsection
+@endsection
 
-    @endsection
+@endsection

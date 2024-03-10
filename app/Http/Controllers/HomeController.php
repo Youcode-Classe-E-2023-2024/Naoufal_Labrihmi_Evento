@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Custom;
 use App\Mail\TicketValidated;
+use App\Models\Admin;
 use App\Models\BuyTickets;
 use App\Models\Cities;
 use App\Models\EventImages;
@@ -15,10 +16,14 @@ use App\Models\Notification;
 use App\Models\Organizer;
 use App\Models\User;
 use App\Models\Users;
+use Illuminate\Console\Scheduling\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-
+use App\Charts\EventChart;
+use App\Charts\UserChart;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class HomeController extends Controller
 {
@@ -42,6 +47,7 @@ class HomeController extends Controller
             ->paginate(5);
 
         $eventCount = "";
+        $categories = EventType::withCount('events')->get();
 
         // Retrieve all event images
         $eventImages = EventImages::all();
@@ -80,7 +86,9 @@ class HomeController extends Controller
             'allOrganizers',
             'cities',
             'eventTypes',
-            'selectedEventType'
+            'selectedEventType',
+            'categories'
+
         );
 
         return view('home')->with($data);
@@ -89,14 +97,23 @@ class HomeController extends Controller
 
 
 
+
     public function admin()
     {
-        // $notification = Notification::where('noti_status', '=', 0)->get();
-        // check($notification);
-        // $data = compact('notification');
-        //   return view('admin.dashboard')->with($data);
-        return view('admin.dashboard');
+        $totalUsers = User::where('user_type', 'U')->count() + Admin::where('user_type', 'U')->count() + Organizer::where('user_type', 'U')->count();
+        $totalOrganizers = Organizer::where('user_type', 'OA')->count() + User::where('user_type', 'OA')->count() + Admin::where('user_type', 'OA')->count();
+        $totalEvents = Events::count();
+        $totalEventTypes = EventType::count();
+        $eventTypes = EventType::all();
+        $events = Events::all();
+        $users = User::all();
+        $organizers = Organizer::all();
+
+
+
+        return view('admin.dashboard', compact('totalUsers', 'totalOrganizers', 'totalEvents', 'totalEventTypes', 'eventTypes', 'events'));
     }
+
 
     public function admin_notifications()
     {
@@ -257,8 +274,35 @@ class HomeController extends Controller
         }
     }
 
+    public function downloadTicketPDF($id)
+    {
+        $ticket = BuyTickets::find($id);
+        $event = Events::find($ticket->buyer_event_id);
+        $qrCode = $this->generateQRCode($ticket);
 
+        if (!$ticket) {
+            abort(404);
+        }
+        $qrCode = $this->generateQRCode($ticket); // This line generates the QR code
 
+        // Generate the PDF content
+        $pdfContent = view('ticket_pdf', compact('ticket', 'event', 'qrCode'))->render();
+
+        // Create Dompdf instance
+        $dompdf = new Dompdf();
+
+        // Load HTML content into Dompdf
+        $dompdf->loadHtml($pdfContent);
+
+        // (Optional) Set paper size and orientation
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render PDF (generate)
+        $dompdf->render();
+
+        // Output the generated PDF to the browser
+        return $dompdf->stream("ticket_{$id}.pdf");
+    }
 
 
     public function payment_confirmed(Request $request)
