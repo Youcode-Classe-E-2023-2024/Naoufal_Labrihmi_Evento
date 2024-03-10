@@ -365,7 +365,14 @@ class HomeController extends Controller
 
     public function dashboard()
     {
+
+
         $user_id = session()->get('user_id');
+        $eventList = Events::orderBy('event_id', 'desc')->where('event_author_id', '=', $user_id)->get();
+        $date = date('Y-m-d');
+        $completedTotalEvents = $eventList->where('event_start_date', '<', $date)->count();
+        $upcommingTotalEvents = $eventList->where('event_start_date', '>', $date)->count();
+
         //Event Count and Listing
         $totalEvents = Events::where('event_author_id', '=', $user_id)->count();
         $eventList = Events::orderBy('event_id', 'desc')->where('event_author_id', '=', $user_id)->paginate(3);
@@ -383,7 +390,7 @@ class HomeController extends Controller
         // print_r($soldTickets->toArray());
         // die;
         // $CompletedEvents = $eventList->where('event_end_date', '<', date('Y-m-d'))->get();
-        $data = compact('eventList', 'totalEvents', 'soldTickets', 'soldTicketsCount', 'totalEarnings');
+        $data = compact('eventList', 'totalEvents', 'soldTickets', 'soldTicketsCount', 'totalEarnings', 'completedTotalEvents', 'upcommingTotalEvents');
         return view('dashboard')->with($data);
     }
     public function events(Request $request)
