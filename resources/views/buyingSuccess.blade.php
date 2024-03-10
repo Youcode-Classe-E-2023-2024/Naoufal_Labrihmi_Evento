@@ -9,12 +9,12 @@
     .line {
         width: 76px;
         height: 6px;
-        background: #63d19e
+        background: #6a89a7;
     }
 
     .steps {
         display: flex;
-        background-color: #63d19e;
+        background-color: #817ab4;
         color: #fff;
         font-size: 12px;
         width: 30px;
@@ -26,7 +26,7 @@
 
     .check1 {
         display: flex;
-        background-color: #63d19e;
+        background-color: #817ab4;
         color: #fff;
         font-size: 17px;
         width: 60px;

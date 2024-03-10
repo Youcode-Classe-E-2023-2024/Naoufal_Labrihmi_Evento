@@ -24,6 +24,7 @@ use App\Charts\EventChart;
 use App\Charts\UserChart;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -53,14 +54,14 @@ class HomeController extends Controller
         $eventImages = EventImages::all();
 
         // Count events for each location
-        $islamabadEvents = Events::where('event_location', '=', 6)->get();
-        $islamabad = $islamabadEvents->where('event_start_date', '>', date('Y-m-d'))->count();
-        $lahoreEvents = Events::where('event_location', '=', 14)->get();
-        $lahore = $lahoreEvents->where('event_start_date', '>', date('Y-m-d'))->count();
-        $karachiEvents = Events::where('event_location', '=', 2)->get();
-        $karachi = $karachiEvents->where('event_start_date', '>', date('Y-m-d'))->count();
-        $multanEvents = Events::where('event_location', '=', 38)->get();
-        $multan = $multanEvents->where('event_start_date', '>', date('Y-m-d'))->count();
+        // $islamabadEvents = Events::where('event_location', '=', 6)->get();
+        // $islamabad = $islamabadEvents->where('event_start_date', '>', date('Y-m-d'))->count();
+        // $lahoreEvents = Events::where('event_location', '=', 14)->get();
+        // $lahore = $lahoreEvents->where('event_start_date', '>', date('Y-m-d'))->count();
+        // $karachiEvents = Events::where('event_location', '=', 2)->get();
+        // $karachi = $karachiEvents->where('event_start_date', '>', date('Y-m-d'))->count();
+        // $multanEvents = Events::where('event_location', '=', 38)->get();
+        // $multan = $multanEvents->where('event_start_date', '>', date('Y-m-d'))->count();
 
         // Retrieve all organizers
         $allOrganizers = Users::where('user_type', '=', 'OA')->get();
@@ -73,22 +74,23 @@ class HomeController extends Controller
 
         // Retrieve all event types
         $eventTypes = EventType::all();
+        // Count events for each city
+        $eventsCountByCity = Events::select('event_location', DB::raw('COUNT(*) as event_count'))
+            ->groupBy('event_location')
+            ->get()
+            ->keyBy('event_location');
 
         $data = compact(
             'events',
             'paidEvents',
             'freeEvents',
             'eventImages',
-            'islamabad',
-            'lahore',
-            'karachi',
-            'multan',
             'allOrganizers',
             'cities',
             'eventTypes',
             'selectedEventType',
-            'categories'
-
+            'categories',
+            'eventsCountByCity'
         );
 
         return view('home')->with($data);
@@ -111,6 +113,7 @@ class HomeController extends Controller
 
 
 
+
         return view('admin.dashboard', compact('totalUsers', 'totalOrganizers', 'totalEvents', 'totalEventTypes', 'eventTypes', 'events'));
     }
 
@@ -128,7 +131,10 @@ class HomeController extends Controller
         $eventId = $events->event_id;
         $eventImages = EventImages::where('event_list_id', '=', $eventId)->get();
         $totalReviews = eventReviews::where('event_id', '=', $eventId)->count();
-        $data = compact('events', 'eventImages', 'totalReviews');
+        $city = Cities::find($events->event_location);
+
+        $data = compact('events', 'eventImages', 'totalReviews', 'city');
+
         return view('eventDetails')->with($data);
     }
 

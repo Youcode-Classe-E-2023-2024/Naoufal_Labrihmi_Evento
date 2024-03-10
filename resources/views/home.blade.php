@@ -219,16 +219,15 @@
             <div class="row g-4">
                 @foreach($categories as $category)
                 <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
-                    <a class="cat-item d-block bg-light text-center rounded p-3" href="#">
+                    <a class="cat-item d-block bg-light text-center rounded p-3" href="{{ route('events', ['eventType' => $category->event_type_name]) }}">
                         <div class="rounded p-4">
                             <div class="icon mb-3">
                                 <!-- Image URL from Unsplash API -->
-                                <img class="img-fluid" src="https://source.unsplash.com/200x200/?{{$category->event_type_name}}" alt="Event Type Image">
+                                <img class="img-fluid" src="https://source.unsplash.com/500x500/?{{$category->event_type_name}}" alt="Event Type Image">
                             </div>
 
                             <h6>{{ $category->event_type_name }}</h6>
                             <span>{{ $category->events_count }} Events</span>
-
                         </div>
                     </a>
                 </div>
@@ -331,105 +330,85 @@
                     </div>
                     @endforeach
 
-
-                    {{-- <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                                    <div class="property-item rounded overflow-hidden">
-                                        <div class="position-relative overflow-hidden property-item-display">
-                                            <a href=""><img class="img-fluid" src="{{url('Frontend/img/property-2.jpg')}}" alt=""></a>
-                    <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">For Rent</div>
-                    <div class="bg-white rounded-top text-primary position-absolute start-0 bottom-0 mx-4 pt-1 px-3">Villa</div>
-                </div>
-                <div class="p-4 pb-0">
-                    <h5 class="text-primary mb-3">$12,345</h5>
-                    <a class="d-block h5 mb-2" href="">Golden Urban House For Sell</a>
-                    <p><i class="fa fa-map-marker-alt text-primary me-2"></i>123 Street, New York, USA</p>
-                </div>
-                <div class="d-flex border-top">
-                    <small class="flex-fill text-center border-end py-2"><i class="fa fa-ruler-combined text-primary me-2"></i>1000 Sqft</small>
-                    <small class="flex-fill text-center border-end py-2"><i class="fa fa-bed text-primary me-2"></i>3 Bed</small>
-                    <small class="flex-fill text-center py-2"><i class="fa fa-bath text-primary me-2"></i>2 Bath</small>
+                    <div class="col-12 text-center wow fadeInUp" data-wow-delay="0.1s">
+                        <a class="btn btn-primary py-3 px-5" href="{{route('events')}}">Browse More Events</a>
+                    </div>
                 </div>
             </div>
-        </div> --}}
-        <div class="col-12 text-center wow fadeInUp" data-wow-delay="0.1s">
-            <a class="btn btn-primary py-3 px-5" href="{{route('events')}}">Browse More Events</a>
-        </div>
-    </div>
-</div>
-<div id="tab-2" class="tab-pane fade show p-0">
-    <div class="row g-4">
-        @foreach ($paidEvents as $event)
-        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-            <div class="property-item rounded overflow-hidden">
-                <div class="position-relative property-item-display overflow-hidden">
-                    <a href="{{url('events')}}/{{$event->event_slug}}"><img class="img-responsive" src="{{url(Custom::eventImagePath($event->event_id))}}" alt="" height="237px" width="100%"></a>
-                    @if ($event->event_subscription == 'F')
-                    <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">Free</div>
-                    @elseif($event->event_subscription == 'P')
-                    <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">Paid</div>
-                    @endif
-                    <div class="bg-white rounded-top text-primary position-absolute start-0 bottom-0 mx-4 pt-1 px-3">{{Custom::orgName($event->event_author_id)}}</div>
-                </div>
-                <div class="p-4 pb-0">
-                    @if ($event->event_subscription == 'F')
-                    <h5 class="text-primary mb-3">Rs.0</h5>
-                    @elseif($event->event_subscription == 'P')
-                    <h5 class="text-primary mb-3">Rs.{{$event->event_ticket_price}}</h5>
-                    @endif
-                    <a class="d-block h5 mb-2" href="{{url('events')}}/{{$event->event_slug}}">{{$event->event_name}}</a>
-                    <p><i class="fa fa-map-marker-alt text-primary me-2"></i>{{Custom::cityName($event->event_location)}}</p>
-                </div>
-                <div class="d-flex border-top">
-                    <small class="flex-fill text-center border-end py-2"><i class="fa fa-users text-primary me-2"></i>{{Custom::availableSeats($event->event_id)}} Left</small>
-                    <small class="flex-fill text-center border-end py-2"><i class="fa fas fa-calendar-alt text-primary me-2"></i>{{$event->event_start_date}}</small>
-                    <small class="flex-fill text-center py-2"><i class="fa far fa-clock text-primary me-2"></i>{{$event->event_start_time}}</small>
+            <div id="tab-2" class="tab-pane fade show p-0">
+                <div class="row g-4">
+                    @foreach ($paidEvents as $event)
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="property-item rounded overflow-hidden">
+                            <div class="position-relative property-item-display overflow-hidden">
+                                <a href="{{url('events')}}/{{$event->event_slug}}"><img class="img-responsive" src="{{url(Custom::eventImagePath($event->event_id))}}" alt="" height="237px" width="100%"></a>
+                                @if ($event->event_subscription == 'F')
+                                <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">Free</div>
+                                @elseif($event->event_subscription == 'P')
+                                <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">Paid</div>
+                                @endif
+                                <div class="bg-white rounded-top text-primary position-absolute start-0 bottom-0 mx-4 pt-1 px-3">{{Custom::orgName($event->event_author_id)}}</div>
+                            </div>
+                            <div class="p-4 pb-0">
+                                @if ($event->event_subscription == 'F')
+                                <h5 class="text-primary mb-3">Rs.0</h5>
+                                @elseif($event->event_subscription == 'P')
+                                <h5 class="text-primary mb-3">Rs.{{$event->event_ticket_price}}</h5>
+                                @endif
+                                <a class="d-block h5 mb-2" href="{{url('events')}}/{{$event->event_slug}}">{{$event->event_name}}</a>
+                                <p><i class="fa fa-map-marker-alt text-primary me-2"></i>{{Custom::cityName($event->event_location)}}</p>
+                            </div>
+                            <div class="d-flex border-top">
+                                <small class="flex-fill text-center border-end py-2"><i class="fa fa-users text-primary me-2"></i>{{Custom::availableSeats($event->event_id)}} Left</small>
+                                <small class="flex-fill text-center border-end py-2"><i class="fa fas fa-calendar-alt text-primary me-2"></i>{{$event->event_start_date}}</small>
+                                <small class="flex-fill text-center py-2"><i class="fa far fa-clock text-primary me-2"></i>{{$event->event_start_time}}</small>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                    <div class="col-12 text-center">
+                        <a class="btn btn-primary py-3 px-5" href="{{route('events')}}">Browse More Property</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        @endforeach
-        <div class="col-12 text-center">
-            <a class="btn btn-primary py-3 px-5" href="{{route('events')}}">Browse More Property</a>
-        </div>
-    </div>
-</div>
-<div id="tab-3" class="tab-pane fade show p-0">
-    <div class="row g-4">
-        @foreach ($freeEvents as $event)
-        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-            <div class="property-item rounded overflow-hidden">
-                <div class="position-relative property-item-display overflow-hidden">
-                    <a href="{{url('events')}}/{{$event->event_slug}}"><img class="img-responsive" src="{{url(Custom::eventImagePath($event->event_id))}}" alt="" height="237px" width="100%"></a>
-                    @if ($event->event_subscription == 'F')
-                    <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">Free</div>
-                    @elseif($event->event_subscription == 'P')
-                    <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">Paid</div>
-                    @endif
-                    <div class="bg-white rounded-top text-primary position-absolute start-0 bottom-0 mx-4 pt-1 px-3">{{Custom::orgName($event->event_author_id)}}</div>
-                </div>
-                <div class="p-4 pb-0">
-                    @if ($event->event_subscription == 'F')
-                    <h5 class="text-primary mb-3">Rs.0</h5>
-                    @elseif($event->event_subscription == 'P')
-                    <h5 class="text-primary mb-3">Rs.{{$event->event_ticket_price}}</h5>
-                    @endif
-                    <a class="d-block h5 mb-2" href="{{url('events')}}/{{$event->event_slug}}">{{$event->event_name}}</a>
-                    <p><i class="fa fa-map-marker-alt text-primary me-2"></i>{{Custom::cityName($event->event_location)}}</p>
-                </div>
-                <div class="d-flex border-top">
-                    <small class="flex-fill text-center border-end py-2"><i class="fa fa-users text-primary me-2"></i>{{Custom::availableSeats($event->event_id)}} Left</small>
-                    <small class="flex-fill text-center border-end py-2"><i class="fa fas fa-calendar-alt text-primary me-2"></i>{{$event->event_start_date}}</small>
-                    <small class="flex-fill text-center py-2"><i class="fa far fa-clock text-primary me-2"></i>{{$event->event_start_time}}</small>
+            <div id="tab-3" class="tab-pane fade show p-0">
+                <div class="row g-4">
+                    @foreach ($freeEvents as $event)
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="property-item rounded overflow-hidden">
+                            <div class="position-relative property-item-display overflow-hidden">
+                                <a href="{{url('events')}}/{{$event->event_slug}}"><img class="img-responsive" src="{{url(Custom::eventImagePath($event->event_id))}}" alt="" height="237px" width="100%"></a>
+                                @if ($event->event_subscription == 'F')
+                                <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">Free</div>
+                                @elseif($event->event_subscription == 'P')
+                                <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">Paid</div>
+                                @endif
+                                <div class="bg-white rounded-top text-primary position-absolute start-0 bottom-0 mx-4 pt-1 px-3">{{Custom::orgName($event->event_author_id)}}</div>
+                            </div>
+                            <div class="p-4 pb-0">
+                                @if ($event->event_subscription == 'F')
+                                <h5 class="text-primary mb-3">Rs.0</h5>
+                                @elseif($event->event_subscription == 'P')
+                                <h5 class="text-primary mb-3">Rs.{{$event->event_ticket_price}}</h5>
+                                @endif
+                                <a class="d-block h5 mb-2" href="{{url('events')}}/{{$event->event_slug}}">{{$event->event_name}}</a>
+                                <p><i class="fa fa-map-marker-alt text-primary me-2"></i>{{Custom::cityName($event->event_location)}}</p>
+                            </div>
+                            <div class="d-flex border-top">
+                                <small class="flex-fill text-center border-end py-2"><i class="fa fa-users text-primary me-2"></i>{{Custom::availableSeats($event->event_id)}} Left</small>
+                                <small class="flex-fill text-center border-end py-2"><i class="fa fas fa-calendar-alt text-primary me-2"></i>{{$event->event_start_date}}</small>
+                                <small class="flex-fill text-center py-2"><i class="fa far fa-clock text-primary me-2"></i>{{$event->event_start_time}}</small>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                    <div class="col-12 text-center">
+                        <a class="btn btn-primary py-3 px-5" href="{{route('events')}}">Browse More Property</a>
+                    </div>
                 </div>
             </div>
         </div>
-        @endforeach
-        <div class="col-12 text-center">
-            <a class="btn btn-primary py-3 px-5" href="{{route('events')}}">Browse More Property</a>
-        </div>
     </div>
-</div>
-</div>
-</div>
 </div>
 <!-- Property List End -->
 
@@ -442,66 +421,25 @@
             <p>Eirmod sed ipsum dolor sit rebum labore magna erat. Tempor ut dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed rebum vero dolor duo.</p>
         </div>
         <div class="row g-4">
-            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+            @foreach($cities as $city)
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.{{ $loop->index + 1 }}s">
                 <div class="team-item rounded overflow-hidden">
                     <div class="position-relative">
-                        <img src="{{url('Frontend/img/islamabad.jpg')}}" alt="Islamabad" style="width=100%; height:175px">
-                        {{-- <div class="position-absolute start-50 top-100 translate-middle d-flex align-items-center">
-                                        <a class="btn btn-square mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                                        <a class="btn btn-square mx-1" href=""><i class="fab fa-twitter"></i></a>
-                                        <a class="btn btn-square mx-1" href=""><i class="fab fa-instagram"></i></a>
-                                    </div> --}}
+                        <img src="https://source.unsplash.com/1000x1000/?{{$city->name}}" alt="{{ $city->name }}" style="width: 100%; height: 175px">
                     </div>
                     <div class="text-center p-4 mt-3">
-                        <h5 class="fw-bold mb-0">Islamabad</h5>
+                        <h5 class="fw-bold mb-0">{{ $city->name }}</h5>
                     </div>
                     <div class="text-center">
-                        <h6 class="badge bg-primary p-2"><a class="text-white btn-sm" href="{{url('events?locationUpcoming=6')}}">{{$islamabad}} Upcoming Events <i class="fa bi bi-arrow-right"></i></a></h6>
+                        <h6 class="badge bg-primary p-2"><a class="text-white btn-sm" href="{{ route('events', ['location' => $city->id]) }}">{{ $eventsCountByCity[$city->id]->event_count ?? 0 }} Upcoming Events <i class="fa bi bi-arrow-right"></i></a></h6>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="team-item rounded overflow-hidden">
-                    <div class="position-relative">
-                        <img src="{{url('Frontend/img/lahore.jpg')}}" alt="Lahore" style="width=100%; height:175px">
-                    </div>
-                    <div class="text-center p-4 mt-3">
-                        <h5 class="fw-bold mb-0">Lahore</h5>
-                    </div>
-                    <div class="text-center">
-                        <h6 class="badge bg-primary p-2"><a class="text-white btn-sm" href="{{url('events?locationUpcoming=14')}}">{{$lahore}} Upcoming Events <i class="fa bi bi-arrow-right"></i></a></h6>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="team-item rounded overflow-hidden">
-                    <div class="position-relative">
-                        <img src="{{url('Frontend/img/karachi.jpg')}}" alt="Karachi" style="width=100%; height:175px">
-                    </div>
-                    <div class="text-center p-4 mt-3">
-                        <h5 class="fw-bold mb-0">Karachi</h5>
-                    </div>
-                    <div class="text-center">
-                        <h6 class="badge bg-primary p-2"><a class="text-white btn-sm" href="{{url('events?locationUpcoming=2')}}">{{$karachi}} Upcoming Events <i class="fa bi bi-arrow-right"></i></a></h6>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
-                <div class="team-item rounded overflow-hidden">
-                    <div class="position-relative">
-                        <img src="{{url('Frontend/img/multan.jpg')}}" alt="Multan" style="width=100%; height:175px">
-                    </div>
-                    <div class="text-center p-4 mt-3">
-                        <h5 class="fw-bold mb-0">Multan</h5>
-                    </div>
-                    <div class="text-center">
-                        <h6 class="badge bg-primary p-2"><a class="text-white btn-sm" href="{{url('events?locationUpcoming=38')}}">{{$multan}} Upcoming Events <i class="fa bi bi-arrow-right"></i></a></h6>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </div>
+
 <!-- Team End -->
 
 
