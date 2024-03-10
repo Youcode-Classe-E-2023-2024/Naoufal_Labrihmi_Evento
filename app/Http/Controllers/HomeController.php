@@ -24,6 +24,7 @@ use App\Charts\EventChart;
 use App\Charts\UserChart;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
@@ -401,30 +402,34 @@ class HomeController extends Controller
         $locationUpcoming = $request['locationUpcoming'] ?? "";
         $eventType = $request['eventType'] ?? ""; // Add this line
 
-        $events = Events::orderBy('event_id', 'desc')
-            ->where('approved', 1) // Check if the event is approved
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where("event_name", "LIKE", "%$search%")
-                        ->orWhere("event_slug", "LIKE", "%$search%");
-                });
-            })
-            ->when($organizer, function ($query) use ($organizer) {
-                $query->where("event_author_id", "=", $organizer);
-            })
-            ->when($location, function ($query) use ($location) {
-                $query->where("event_location", "=", $location);
-            })
-            ->when($locationUpcoming, function ($query) use ($locationUpcoming) {
-                $query->where('event_location', '=', $locationUpcoming)
-                    ->where('event_start_date', '>', date('Y-m-d'));
-            })
-            ->when($eventType, function ($query) use ($eventType) { // Add this condition
-                $query->whereHas('eventType', function ($query) use ($eventType) {
-                    $query->where('event_type_name', '=', $eventType);
-                });
-            })
-            ->paginate(6); // Pagination added here
+        $cacheKey = 'events_' . md5(serialize([$search, $organizer, $location, $locationUpcoming, $eventType]));
+
+        $events = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($search, $organizer, $location, $locationUpcoming, $eventType) {
+            return Events::orderBy('event_id', 'desc')
+                ->where('approved', 1) // Check if the event is approved
+                ->when($search, function ($query) use ($search) {
+                    $query->where(function ($query) use ($search) {
+                        $query->where("event_name", "LIKE", "%$search%")
+                            ->orWhere("event_slug", "LIKE", "%$search%");
+                    });
+                })
+                ->when($organizer, function ($query) use ($organizer) {
+                    $query->where("event_author_id", "=", $organizer);
+                })
+                ->when($location, function ($query) use ($location) {
+                    $query->where("event_location", "=", $location);
+                })
+                ->when($locationUpcoming, function ($query) use ($locationUpcoming) {
+                    $query->where('event_location', '=', $locationUpcoming)
+                        ->where('event_start_date', '>', date('Y-m-d'));
+                })
+                ->when($eventType, function ($query) use ($eventType) { // Add this condition
+                    $query->whereHas('eventType', function ($query) use ($eventType) {
+                        $query->where('event_type_name', '=', $eventType);
+                    });
+                })
+                ->paginate(6); // Pagination added here
+        });
 
         $eventCount = $events->total();
 
@@ -438,7 +443,6 @@ class HomeController extends Controller
         $data = compact('events', 'cities', 'location', 'allOrganizers', 'search', 'eventCount', 'organizer', 'eventTypes', 'selectedEventType');
         return view('events')->with($data);
     }
-
 
 
     public function userProfile()
